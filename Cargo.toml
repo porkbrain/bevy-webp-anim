@@ -2,6 +2,12 @@
 name = "bevy_webp_anim"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+keywords = ["bevy", "webp", "video", "animation"]
+description = "Plugin for loading and playing animated webp images in bevy."
+readme = "README.md"
+repository = "https://github.com/bausano/bevy-webp-anim"
+homepage = "https://github.com/bausano/bevy-webp-anim"
 
 [dependencies]
 bevy = { version = "0.12", default-features = false, features = [
@@ -12,6 +18,7 @@ bevy = { version = "0.12", default-features = false, features = [
 image = "0.24"
 thiserror = "1.0"
 tokio = { version = "1.35", features = ["rt", "sync", "rt-multi-thread"] }
+
 
 [[example]]
 name = "basic"
