@@ -8,6 +8,7 @@ description = "Plugin for loading and playing animated webp images in bevy."
 readme = "README.md"
 repository = "https://github.com/bausano/bevy-webp-anim"
 homepage = "https://github.com/bausano/bevy-webp-anim"
+exclude = ["examples", "assets"]
 
 [dependencies]
 bevy = { version = "0.12", default-features = false, features = [
