@@ -1,0 +1,18 @@
+[package]
+name = "bevy_webp_anim"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "0.12", default-features = false, features = [
+    "bevy_asset",
+    "bevy_render",
+    "bevy_sprite",
+] }
+image = "0.24"
+thiserror = "1.0"
+tokio = { version = "1.35", features = ["rt", "sync", "rt-multi-thread"] }
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"
