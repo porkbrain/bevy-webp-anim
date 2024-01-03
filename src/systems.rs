@@ -47,7 +47,7 @@ pub fn load_next_frame(
 }
 
 /// Register this over `T` along with the [`WebpAnimator<T>`] resource.
-/// You can then use [`WebpAnimator:add`] to spawn new videos.
+/// You can then use [`WebpAnimator`] to spawn new videos.
 ///
 /// Since videos are loaded asynchronously, you need to call this and keep
 /// checking each video.

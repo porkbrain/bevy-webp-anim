@@ -58,7 +58,7 @@ pub struct WebpVideo {
 }
 
 /// Controls the playback of a video.
-/// Get this from [`WebpAnimator::add`].
+/// Get this from [`WebpAnimator::add_and_wait_for_asset_load`].
 ///
 /// # Important
 /// Must be added to an entity which also contains [`Handle<Image>`].
@@ -106,6 +106,8 @@ impl<T> WebpAnimator<T> {
 
     /// Given handle, will wait for the asset to be loaded and then start
     /// the frame decoder.
+    /// This is only useful in conjunction with
+    /// [`crate::systems::start_loaded_videos`].
     ///
     /// Associate the return value with an entity that contains a
     /// [`Handle<Image>`].
