@@ -1,6 +1,7 @@
 # `bevy_webp_anim`
 
 [![Docs](https://docs.rs/bevy_webp_anim/badge.svg)](https://docs.rs/bevy_webp_anim/latest/bevy_webp_anim/)
+![crates.io](https://img.shields.io/crates/v/bevy_webp_anim.svg)
 
 Plugin for loading and playing animated `.webp` images in bevy.
 We make the assumption that any webp file loaded with the provided `WebpLoader` is an animation.
