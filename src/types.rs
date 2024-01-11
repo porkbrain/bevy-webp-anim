@@ -51,8 +51,9 @@ pub struct WebpBundle {
     pub view_visibility: ViewVisibility,
 }
 
-#[derive(Asset, TypePath, Clone)]
+#[derive(Asset, Reflect, Clone)]
 pub struct WebpVideo {
+    #[reflect(ignore)]
     pub bytes: Vec<u8>,
     pub label: String,
 }
@@ -63,7 +64,7 @@ pub struct WebpVideo {
 /// # Important
 /// Must be added to an entity which also contains [`Handle<Image>`].
 /// Otherwise the frames will be lost.
-#[derive(Component, Default)]
+#[derive(Component, Reflect, Default)]
 pub struct RemoteControl {
     /// Determines how often next frame is loaded.
     /// Also enables pausing the video.
