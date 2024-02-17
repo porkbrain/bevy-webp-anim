@@ -1,6 +1,6 @@
 [package]
 name = "bevy_webp_anim"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 keywords = ["bevy", "webp", "video", "animation"]
@@ -10,15 +10,17 @@ repository = "https://github.com/bausano/bevy-webp-anim"
 homepage = "https://github.com/bausano/bevy-webp-anim"
 exclude = ["examples", "assets"]
 
+
 [dependencies]
-bevy = { version = "0.12", default-features = false, features = [
-    "bevy_asset",
-    "bevy_render",
-    "bevy_sprite",
-] }
 image = "0.24"
 thiserror = "1.0"
 tokio = { version = "1.35", features = ["rt", "sync", "rt-multi-thread"] }
+
+
+[dependencies.bevy]
+default-features = false
+features = ["bevy_asset", "bevy_render", "bevy_sprite"]
+version = "0.13"
 
 
 [[example]]
