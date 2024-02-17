@@ -2,7 +2,10 @@ use std::{collections::BTreeMap, marker::PhantomData};
 
 use bevy::{
     prelude::*,
-    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
+    render::{
+        render_asset::RenderAssetUsages,
+        render_resource::{Extent3d, TextureDimension, TextureFormat},
+    },
     utils::Uuid,
 };
 use image::{codecs::webp::WebPDecoder, AnimationDecoder};
@@ -204,6 +207,7 @@ impl WebpVideo {
                         TextureDimension::D2,
                         frame.clone().into_buffer().into_raw(),
                         TextureFormat::Rgba8Unorm,
+                        RenderAssetUsages::MAIN_WORLD,
                     );
 
                     // animation no longer required
