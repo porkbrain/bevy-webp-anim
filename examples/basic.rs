@@ -8,6 +8,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(bevy_webp_anim::Plugin)
         .init_resource::<bevy_webp_anim::WebpAnimator>()
+        .add_systems(Startup, (spawn_camera, spawn_video))
         .add_systems(
             Update,
             (
@@ -16,8 +17,7 @@ fn main() {
                 bevy_webp_anim::systems::load_next_frame,
             ),
         )
-        .add_systems(Startup, (spawn_camera, spawn_video))
-        .run();
+        .run()
 }
 
 fn spawn_camera(mut commands: Commands) {

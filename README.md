@@ -17,6 +17,10 @@ This component contains the uuid of the video and FPS settings.
 By running the `load_next_frame` system e.g. on `Update` or on a fixed schedule with period matching that of the FPS of the video, each `RemoteControl` component will load the next frame of the video into the entity's `Handle<Image>`.
 If the entity does not have a `Handle<Image>` component, the frame is dropped.
 
+## Example
+
+`$ cargo run --example basic` for a bunny.
+
 ## Issue: Support large videos
 
 The current implementation of `bevy_webp_anim` loads each frame into memory.
