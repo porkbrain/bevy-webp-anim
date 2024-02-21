@@ -207,7 +207,7 @@ impl WebpVideo {
                         TextureDimension::D2,
                         frame.clone().into_buffer().into_raw(),
                         TextureFormat::Rgba8Unorm,
-                        RenderAssetUsages::MAIN_WORLD,
+                        RenderAssetUsages::RENDER_WORLD,
                     );
 
                     // animation no longer required
