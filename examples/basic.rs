@@ -17,7 +17,7 @@ fn main() {
                 bevy_webp_anim::systems::load_next_frame,
             ),
         )
-        .run()
+        .run();
 }
 
 fn spawn_camera(mut commands: Commands) {

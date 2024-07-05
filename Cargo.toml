@@ -1,6 +1,6 @@
 [package]
 name = "bevy_webp_anim"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 keywords = ["bevy", "webp", "video", "animation"]
@@ -12,20 +12,21 @@ exclude = ["examples", "assets"]
 
 
 [dependencies]
-image = "0.24"
+image = "0.25"
 thiserror = "1.0"
 tokio = { version = "1.35", features = ["rt", "sync", "rt-multi-thread"] }
-
+uuid = "1.7"
 
 [dependencies.bevy]
 default-features = false
 features = ["bevy_asset", "bevy_render", "bevy_sprite"]
-version = "0.13"
+version = "0.14"
+
+
+[dev-dependencies]
+bevy = { version = "0.14", default-features = true }
 
 
 [[example]]
 name = "basic"
 path = "examples/basic.rs"
-
-[dev-dependencies]
-bevy = { version = "0.13", default-features = true }

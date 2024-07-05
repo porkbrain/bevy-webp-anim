@@ -40,3 +40,8 @@ This would be useful if you play the same video in several places on your screen
 Right now, you'd need separate decoders and separate `Handle<Image>`.
 
 I don't need this feature in my project at the moment, but happy to add it if there's a demand.
+
+## Issue: Explore bevy's work load system instead of a custom tokio runtime
+
+Bevy comes with its own thread pool that can run tasks.
+It might be preferable to use this instead of spawning another tokio runtime.
