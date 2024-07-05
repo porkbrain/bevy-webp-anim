@@ -28,8 +28,7 @@ impl AssetLoader for WebpLoader {
         reader: &'a mut Reader,
         _settings: &'a Self::Settings,
         load_context: &'a mut LoadContext,
-    ) -> impl ConditionalSendFuture
-           + std::future::Future<
+    ) -> impl ConditionalSendFuture<
         Output = Result<
             <Self as AssetLoader>::Asset,
             <Self as AssetLoader>::Error,
