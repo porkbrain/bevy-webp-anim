@@ -234,23 +234,25 @@ impl WebpVideo {
             .filter_map(Result::ok)
             .collect();
 
-        for frame in frames {
-            let (width, height) = frame.buffer().dimensions();
-            let image = Image::new(
-                Extent3d {
-                    width,
-                    height,
-                    ..default()
-                },
-                TextureDimension::D2,
-                frame.clone().into_buffer().into_raw(),
-                TextureFormat::Rgba8Unorm,
-                RenderAssetUsages::RENDER_WORLD,
-            );
+        loop {
+            for frame in &frames {
+                let (width, height) = frame.buffer().dimensions();
+                let image = Image::new(
+                    Extent3d {
+                        width,
+                        height,
+                        ..default()
+                    },
+                    TextureDimension::D2,
+                    frame.clone().into_buffer().into_raw(),
+                    TextureFormat::Rgba8Unorm,
+                    RenderAssetUsages::RENDER_WORLD,
+                );
 
-            // animation no longer required
-            if animation_frames.send(image).await.is_err() {
-                break;
+                // animation no longer required
+                if animation_frames.send(image).await.is_err() {
+                    break;
+                }
             }
         }
     }
