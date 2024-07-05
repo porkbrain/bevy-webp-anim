@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, marker::PhantomData};
+use std::{collections::BTreeMap, io::Cursor, marker::PhantomData};
 
 use bevy::{
     prelude::*,
@@ -6,11 +6,11 @@ use bevy::{
         render_asset::RenderAssetUsages,
         render_resource::{Extent3d, TextureDimension, TextureFormat},
     },
-    utils::Uuid,
 };
-use image::{codecs::webp::WebPDecoder, AnimationDecoder};
+use image::{codecs::webp::WebPDecoder, AnimationDecoder, ImageError};
 use tokio::sync::mpsc::{Receiver, Sender};
 pub use tokio::{runtime, sync::mpsc::error::TryRecvError};
+use uuid::Uuid;
 
 /// See [`WebpAnimator::prepared_frames_count`].
 pub const DEFAULT_PREPARED_FRAMES_COUNT: usize = 16;
@@ -185,6 +185,14 @@ impl WebpVideo {
     pub async fn produce(self, animation_frames: Sender<Image>) {
         let WebpVideo { bytes, label } = self;
 
+        let decoder = match WebPDecoder::new(Cursor::new(bytes)) {
+            Ok(decoder) => decoder,
+            Err(e) => {
+                error!("Cannot construct webp decoder {label}: {e}");
+                return;
+            }
+        };
+
         // We decode each frame only once and then play them over and
         // over.
         // This is optimized for replaying and low CPU usage.
@@ -192,31 +200,60 @@ impl WebpVideo {
         // TODO: Enable an alternative with lower memory usage and
         // faster startup times where we decode each frame every time
         // it is played.
-        match WebPDecoder::new(bytes.as_slice())
-            .and_then(|decoder| decoder.into_frames().collect_frames())
-        {
-            Ok(frames) => loop {
-                for frame in &frames {
-                    let (width, height) = frame.buffer().dimensions();
-                    let image = Image::new(
-                        Extent3d {
-                            width,
-                            height,
-                            ..default()
-                        },
-                        TextureDimension::D2,
-                        frame.clone().into_buffer().into_raw(),
-                        TextureFormat::Rgba8Unorm,
-                        RenderAssetUsages::RENDER_WORLD,
-                    );
 
-                    // animation no longer required
-                    if animation_frames.send(image).await.is_err() {
-                        break;
+        // we need to collect because we send the frames over an async channel
+        let frames: Vec<_> = decoder
+            .into_frames()
+            .take_while(|frame_res| match frame_res {
+                Ok(_) => true,
+                Err(ImageError::Decoding(err)) => {
+                    use std::error::Error;
+                    if let Some(image_webp::DecodingError::NoMoreFrames) =
+                        err.source().and_then(|err| {
+                            err.downcast_ref::<image_webp::DecodingError>()
+                        })
+                    {
+                        // iterator ended
+                        // TODO: https://github.com/image-rs/image/issues/2263
+                    } else {
+                        error!(
+                            "Cannot decode webp frame from video {label}: {:?}",
+                            err.source()
+                        );
                     }
+
+                    false
                 }
-            },
-            Err(e) => error!("Cannot load webp video {label}: {e}"),
-        };
+                Err(e) => {
+                    error!(
+                        "Cannot collect webp frames from video {label}: {e}"
+                    );
+                    false
+                }
+            })
+            .filter_map(Result::ok)
+            .collect();
+
+        loop {
+            for frame in &frames {
+                let (width, height) = frame.buffer().dimensions();
+                let image = Image::new(
+                    Extent3d {
+                        width,
+                        height,
+                        ..default()
+                    },
+                    TextureDimension::D2,
+                    frame.clone().into_buffer().into_raw(),
+                    TextureFormat::Rgba8Unorm,
+                    RenderAssetUsages::RENDER_WORLD,
+                );
+
+                // animation no longer required
+                if animation_frames.send(image).await.is_err() {
+                    break;
+                }
+            }
+        }
     }
 }
