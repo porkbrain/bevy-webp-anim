@@ -7,7 +7,7 @@ use bevy::{
         render_resource::{Extent3d, TextureDimension, TextureFormat},
     },
 };
-use image::{codecs::webp::WebPDecoder, AnimationDecoder};
+use image::{codecs::webp::WebPDecoder, AnimationDecoder, ImageError};
 use tokio::sync::mpsc::{Receiver, Sender};
 pub use tokio::{runtime, sync::mpsc::error::TryRecvError};
 use uuid::Uuid;
@@ -200,31 +200,58 @@ impl WebpVideo {
         // TODO: Enable an alternative with lower memory usage and
         // faster startup times where we decode each frame every time
         // it is played.
-        match decoder.into_frames().collect_frames() {
-            Ok(frames) => loop {
-                for frame in &frames {
-                    let (width, height) = frame.buffer().dimensions();
-                    let image = Image::new(
-                        Extent3d {
-                            width,
-                            height,
-                            ..default()
-                        },
-                        TextureDimension::D2,
-                        frame.clone().into_buffer().into_raw(),
-                        TextureFormat::Rgba8Unorm,
-                        RenderAssetUsages::RENDER_WORLD,
-                    );
 
-                    // animation no longer required
-                    if animation_frames.send(image).await.is_err() {
-                        break;
+        // we need to collect because we send the frames over an async channel
+        let frames: Vec<_> = decoder
+            .into_frames()
+            .take_while(|frame_res| match frame_res {
+                Ok(_) => true,
+                Err(ImageError::Decoding(err)) => {
+                    use std::error::Error;
+                    if let Some(image_webp::DecodingError::NoMoreFrames) =
+                        err.source().and_then(|err| {
+                            err.downcast_ref::<image_webp::DecodingError>()
+                        })
+                    {
+                        // iterator ended
+                        // TODO: https://github.com/image-rs/image/issues/2263
+                    } else {
+                        error!(
+                            "Cannot decode webp frame from video {label}: {:?}",
+                            err.source()
+                        );
                     }
+
+                    false
                 }
-            },
-            Err(e) => {
-                error!("Cannot collect webp frames from video {label}: {e}")
+                Err(e) => {
+                    error!(
+                        "Cannot collect webp frames from video {label}: {e}"
+                    );
+                    false
+                }
+            })
+            .filter_map(Result::ok)
+            .collect();
+
+        for frame in frames {
+            let (width, height) = frame.buffer().dimensions();
+            let image = Image::new(
+                Extent3d {
+                    width,
+                    height,
+                    ..default()
+                },
+                TextureDimension::D2,
+                frame.clone().into_buffer().into_raw(),
+                TextureFormat::Rgba8Unorm,
+                RenderAssetUsages::RENDER_WORLD,
+            );
+
+            // animation no longer required
+            if animation_frames.send(image).await.is_err() {
+                break;
             }
-        };
+        }
     }
 }

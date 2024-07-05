@@ -13,6 +13,7 @@ exclude = ["examples", "assets"]
 
 [dependencies]
 image = "0.25"
+image-webp = "*"                                                           # we want the one that image uses
 thiserror = "1.0"
 tokio = { version = "1.35", features = ["rt", "sync", "rt-multi-thread"] }
 uuid = "1.7"
